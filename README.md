@@ -55,7 +55,7 @@ Registre équipe :
 
 ## Contrôles et limites
 
-18 tests couvrent notamment la file, l'export ZIP, le blocage sans fournisseur, l'accès privé, les citations, les périodes et l'affectation documentaire. Le test de pipeline remplace l'appel modèle par une réponse simulée ; il ne valide pas les performances du modèle réel.
+19 tests couvrent notamment la file, l'export ZIP, le blocage sans fournisseur, l'accès privé, les citations, les périodes et l'affectation documentaire. Le test de pipeline remplace l'appel modèle par une réponse simulée ; il ne valide pas les performances du modèle réel.
 
 Le lecteur DOC/DOCX indique une pagination logique, différente des pages imprimées. L'OCR nécessite une relecture visuelle pour les noms, dates et cachets. Les signatures ne sont pas générées. Les formulaires exportés sont génériques et doivent être confrontés au DAO officiel.
 
@@ -64,3 +64,7 @@ Les emplois, projets et périodes ne sont pas déduits d'une date de diplôme. U
 Les appels interrompus ne sont pas relancés silencieusement : un appel peut déjà avoir été facturé. Le service est prévu pour un propriétaire unique. Le chiffrement applicatif des fichiers au repos, les rôles multiclients, WhatsApp, les webhooks sortants et la soumission d'offres ne sont pas implémentés.
 
 Tests : `python -m unittest -v`.
+
+## Mode local sans API
+
+MODEL_PROVIDER=local active un inventaire documentaire sans appel facturé. Le ZIP comprend aussi les textes extraits. Les passages sont proposés à la revue ; aucun verdict de conformité ou affectation automatique ne provient de ce mode. La configuration IA reste nécessaire pour une analyse sémantique.

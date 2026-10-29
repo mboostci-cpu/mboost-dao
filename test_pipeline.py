@@ -41,7 +41,7 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(job['state'],'done')
         response=self.client.get('/api/cases/'+job['result']['case_id']+'/bundle')
         self.assertEqual(response.status_code,200)
-        self.assertEqual(set(zipfile.ZipFile(BytesIO(response.content)).namelist()),{'rapport.json','CV_PER2_BROUILLON.docx','A_LIRE.txt'})
+        self.assertEqual(set(zipfile.ZipFile(BytesIO(response.content)).namelist()),{'rapport.json','CV_PER2_BROUILLON.docx','A_LIRE.txt','textes_extraits.json'})
     def test_no_provider_blocks_job(self):
         response=self.client.post('/api/jobs',data={'candidate_name':'TEST'},files={'dao':('dao.txt',b'DAO')})
         store=JobStore(DATA_DIR/'queue');jid=response.json()['job_id']
@@ -51,3 +51,14 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(self.client.post('/api/jobs',data={'candidate_name':'TEST'},files={'dao':('x.exe',b'x')}).status_code,400)
     def test_cross_site_write_blocked(self):
         self.assertEqual(self.client.post('/api/jobs',headers={'Origin':'https://attacker.invalid'},data={'candidate_name':'TEST'},files={'dao':('dao.txt',b'DAO')}).status_code,403)
+
+    def test_local_pipeline_without_api(self):
+        response=self.client.post('/api/jobs',data={'candidate_name':'TEST'},files={'dao':('dao.txt',b'Personnel : chef de chantier. Trois ans requis.')})
+        store=JobStore(DATA_DIR/'queue');jid=response.json()['job_id']
+        with patch.dict(os.environ,{'MODEL_PROVIDER':'local'}):process(store.get(jid),store)
+        self.assertEqual(store.get(jid)['state'],'done')
+        case_id=store.get(jid)['result']['case_id']
+        report=self.client.get('/api/cases/'+case_id+'/report').json()
+        self.assertEqual(report['analysis']['mode'],'extraction_locale_sans_IA')
+        self.assertEqual(report['analysis']['matches'],[])
+        self.assertEqual(self.client.get('/api/cases/'+case_id+'/bundle').status_code,200)

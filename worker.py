@@ -16,7 +16,7 @@ def process(job,store):
         return await analyze(candidate_name=payload['candidate_name'],company=payload.get('company',''),proposed_roles=payload.get('proposed_roles',''),diploma=payload.get('diploma',''),companies=payload.get('companies',''),dao=dao,candidate_docs=documents)
     try:
         response=asyncio.run(execute());case=json.loads(response.body)
-        state='done' if case['status']=='analysis_ready' else 'blocked'
+        state='done' if case['status'] in ('analysis_ready','extraction_ready') else 'blocked'
         store.finish(job['id'],state,{'case_id':case['case_id'],'status':case['status']})
     except Exception as exc:
         # Do not log document content, keys or raw provider responses.

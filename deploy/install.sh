@@ -13,7 +13,7 @@ if [ ! -f /etc/mboost-cv-dao.env ]; then
  install -m 600 /dev/null /etc/mboost-cv-dao.env
  cat > /etc/mboost-cv-dao.env <<'ENV'
 DATA_DIR=/var/lib/mboost-cv-dao
-MODEL_PROVIDER=
+MODEL_PROVIDER=local
 OPENAI_API_KEY=
 OPENAI_MODEL=
 ANTHROPIC_API_KEY=
@@ -27,4 +27,4 @@ install -m 644 deploy/mboost-cv-web.service deploy/mboost-cv-worker.service /etc
 install -m 644 deploy/mboost-cv-backup.service deploy/mboost-cv-backup.timer /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable --now mboost-cv-web mboost-cv-worker mboost-cv-backup.timer
-curl --fail --silent http://127.0.0.1:8012/health
+curl --fail --silent --retry 15 --retry-connrefused --retry-delay 1 http://127.0.0.1:8012/health
