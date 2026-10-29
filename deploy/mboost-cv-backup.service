@@ -1,0 +1,6 @@
+[Unit]
+Description=MBOOST CV DAO private backup
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/mboost-cv-dao/deploy/backup.sh
+UMask=0077
